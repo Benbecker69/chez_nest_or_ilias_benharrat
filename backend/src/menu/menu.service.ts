@@ -4,11 +4,8 @@ export interface MenuDiscountResult {
   discountApplied: boolean;
   discountAmount: number;
   discountPercentage: number;
-  itemsInMenu: {
-    pizzaPrice: number;
-    drinkPrice: number;
-    dessertPrice: number;
-  } | null;
+  eligibleAmount: number;
+  alcoholicDrinksAmount: number;
 }
 
 @Injectable()
@@ -20,7 +17,7 @@ export class MenuService {
    * - 1 pizza
    * - 1 boisson SANS alcool
    * - 1 dessert
-   * Alors réduction de 10% sur la somme de ces 3 éléments
+   * Alors réduction de 10% sur TOUS les produits SAUF les boissons AVEC alcool
    *
    * @param pizzaPrices - Prix de toutes les pizzas de la commande
    * @param drinkPrices - Prix de toutes les boissons (avec info alcool)
@@ -48,32 +45,38 @@ export class MenuService {
         discountApplied: false,
         discountAmount: 0,
         discountPercentage: 0,
-        itemsInMenu: null,
+        eligibleAmount: 0,
+        alcoholicDrinksAmount: 0,
       };
     }
 
-    // Prendre le premier de chaque (le moins cher pour optimiser le client)
-    // En réalité, on pourrait optimiser en prenant les moins chers, mais
-    // pour simplifier, on prend le premier de chaque
-    const pizzaPrice = pizzaPrices[0];
-    const drinkPrice = nonAlcoholicDrinks[0].price;
-    const dessertPrice = dessertPrices[0];
+    // Calculer la somme de TOUS les produits éligibles
+    // Éligibles = TOUTES les pizzas + TOUTES les boissons sans alcool + TOUS les desserts
+    const totalPizzas = pizzaPrices.reduce((sum, price) => sum + price, 0);
+    const totalNonAlcoholicDrinks = nonAlcoholicDrinks.reduce(
+      (sum, drink) => sum + drink.price,
+      0,
+    );
+    const totalDesserts = dessertPrices.reduce((sum, price) => sum + price, 0);
 
-    // Calculer la somme des 3 éléments
-    const menuTotal = pizzaPrice + drinkPrice + dessertPrice;
+    const eligibleAmount = totalPizzas + totalNonAlcoholicDrinks + totalDesserts;
 
-    // Appliquer 10% de réduction
-    const discountAmount = menuTotal * 0.1;
+    // Calculer la somme des boissons avec alcool (NON éligibles)
+    const alcoholicDrinks = drinkPrices.filter((drink) => drink.withAlcohol);
+    const alcoholicDrinksAmount = alcoholicDrinks.reduce(
+      (sum, drink) => sum + drink.price,
+      0,
+    );
+
+    // Appliquer 10% de réduction sur le montant éligible
+    const discountAmount = eligibleAmount * 0.1;
 
     return {
       discountApplied: true,
       discountAmount: Number(discountAmount.toFixed(2)),
       discountPercentage: 10,
-      itemsInMenu: {
-        pizzaPrice,
-        drinkPrice,
-        dessertPrice,
-      },
+      eligibleAmount: Number(eligibleAmount.toFixed(2)),
+      alcoholicDrinksAmount: Number(alcoholicDrinksAmount.toFixed(2)),
     };
   }
 }
