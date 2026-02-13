@@ -49,6 +49,36 @@ export class PizzasService {
     return pizza;
   }
 
+  /**
+   * Recherche les pizzas par ingrédients
+   * Les ingrédients sont normalisés (lowercase, trim) pour la recherche
+   * Une pizza correspond si elle contient TOUS les ingrédients recherchés
+   *
+   * @param searchIngredients - Liste des ingrédients à rechercher
+   * @returns Pizzas contenant tous les ingrédients
+   */
+  findByIngredients(searchIngredients: string[]): Pizza[] {
+    // Normaliser les ingrédients de recherche (lowercase, trim)
+    const normalizedSearch = searchIngredients.map((ingredient) =>
+      ingredient.toLowerCase().trim(),
+    );
+
+    // Filtrer les pizzas qui contiennent TOUS les ingrédients recherchés
+    return this.pizzas.filter((pizza) => {
+      // Normaliser les ingrédients de la pizza
+      const normalizedPizzaIngredients = pizza.ingredients.map((ingredient) =>
+        ingredient.toLowerCase().trim(),
+      );
+
+      // Vérifier que tous les ingrédients recherchés sont dans la pizza
+      return normalizedSearch.every((searchIngredient) =>
+        normalizedPizzaIngredients.some((pizzaIngredient) =>
+          pizzaIngredient.includes(searchIngredient),
+        ),
+      );
+    });
+  }
+
   create(createPizzaDto: CreatePizzaDto): Pizza {
     const newPizza: Pizza = {
       id: this.nextId++,

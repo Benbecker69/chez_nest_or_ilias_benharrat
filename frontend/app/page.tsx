@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Pizza, ShoppingCart, Check, Loader2 } from 'lucide-react';
+import { Pizza, Wine, IceCream, Loader2 } from 'lucide-react';
 import {
   getPizzas,
   getDrinks,
@@ -14,6 +14,14 @@ import {
   type Dessert,
   type Order,
 } from '@/lib/api';
+import Header from '@/components/Header';
+import Section from '@/components/Section';
+import ProductCard from '@/components/ProductCard';
+import Cart from '@/components/Cart';
+import OrderList from '@/components/OrderList';
+import SectionSkeleton from '@/components/skeletons/SectionSkeleton';
+import CartSkeleton from '@/components/skeletons/CartSkeleton';
+import OrderListSkeleton from '@/components/skeletons/OrderListSkeleton';
 
 export default function Home() {
   const [pizzas, setPizzas] = useState<PizzaType[]>([]);
@@ -22,6 +30,9 @@ export default function Home() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+
+  // Recherche globale
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Panier
   const [selectedPizzas, setSelectedPizzas] = useState<number[]>([]);
@@ -51,6 +62,28 @@ export default function Home() {
     }
   }
 
+  // Filtrer les produits en fonction de la recherche
+  const filteredPizzas = pizzas.filter((pizza) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      pizza.name.toLowerCase().includes(query) ||
+      pizza.ingredients.some((ing) => ing.toLowerCase().includes(query))
+    );
+  });
+
+  const filteredDrinks = drinks.filter((drink) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return drink.name.toLowerCase().includes(query);
+  });
+
+  const filteredDesserts = desserts.filter((dessert) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return dessert.name.toLowerCase().includes(query);
+  });
+
   async function handleCreateOrder() {
     if (selectedPizzas.length === 0) {
       alert('Sélectionnez au moins une pizza');
@@ -64,11 +97,9 @@ export default function Home() {
         drinks: selectedDrinks.length > 0 ? selectedDrinks : undefined,
         desserts: selectedDesserts.length > 0 ? selectedDesserts : undefined,
       });
-      // Reset panier
       setSelectedPizzas([]);
       setSelectedDrinks([]);
       setSelectedDesserts([]);
-      // Recharger les commandes
       const o = await getOrders();
       setOrders(o);
     } catch (error: unknown) {
@@ -101,7 +132,6 @@ export default function Home() {
     }
   }
 
-  // Calculer si menu promo s'applique sur le panier
   const hasMenuDiscount =
     selectedPizzas.length > 0 &&
     selectedDrinks.some((id) => {
@@ -110,281 +140,213 @@ export default function Home() {
     }) &&
     selectedDesserts.length > 0;
 
+  const cartPizzas = selectedPizzas
+    .map((id) => pizzas.find((p) => p.id === id))
+    .filter((p): p is PizzaType => p !== undefined);
+
+  const cartDrinks = selectedDrinks
+    .map((id) => drinks.find((d) => d.id === id))
+    .filter((d): d is Drink => d !== undefined);
+
+  const cartDesserts = selectedDesserts
+    .map((id) => desserts.find((d) => d.id === id))
+    .filter((d): d is Dessert => d !== undefined);
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+      <div className="min-h-screen bg-slate-50">
+        <Header searchQuery="" onSearchChange={() => {}} />
+
+        <main className="max-w-7xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Colonne gauche - Menu skeletons */}
+            <div className="lg:col-span-2 space-y-12">
+              <SectionSkeleton itemCount={3} />
+              <SectionSkeleton itemCount={5} />
+              <SectionSkeleton itemCount={4} />
+            </div>
+
+            {/* Colonne droite - Panier & Commandes skeletons */}
+            <div className="space-y-6">
+              <CartSkeleton />
+              <OrderListSkeleton />
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <Pizza className="w-8 h-8 text-gray-700" />
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Chez Nest-Or
-            </h1>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-slate-50">
+      <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Colonne gauche - Menu */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-12">
             {/* Pizzas */}
-            <section>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
-                Pizzas
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {pizzas
-                  .filter((p) => p.available)
-                  .map((pizza) => (
-                    <button
-                      key={pizza.id}
-                      onClick={() =>
-                        toggleSelection(
-                          pizza.id,
-                          selectedPizzas,
-                          setSelectedPizzas
-                        )
-                      }
-                      className={`text-left p-4 rounded-lg border-2 transition ${
-                        selectedPizzas.includes(pizza.id)
-                          ? 'border-gray-900 bg-gray-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-medium text-gray-900">
-                            {pizza.name}
-                          </h3>
-                          <p className="text-sm text-gray-500 mt-1">
-                            {pizza.ingredients.join(', ')}
-                          </p>
-                        </div>
-                        <span className="text-gray-900 font-medium">
-                          {pizza.price.toFixed(2)}€
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-              </div>
-            </section>
+            <Section
+              title="Nos Pizzas"
+              icon={<Pizza className="w-6 h-6" />}
+            >
+              {filteredPizzas.filter((p) => p.available).length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
+                  <Pizza className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-500 font-medium">
+                    Aucun résultat dans la catégorie "Pizzas"
+                  </p>
+                  <p className="text-sm text-slate-400 mt-1">
+                    Essayez avec d'autres mots-clés
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {filteredPizzas
+                    .filter((p) => p.available)
+                    .map((pizza) => {
+                    // Détecter le format d'image disponible
+                    const imageExt = pizza.id === 1 ? 'webp' : 'jpg';
+                    return (
+                      <ProductCard
+                        key={pizza.id}
+                        id={pizza.id}
+                        name={pizza.name}
+                        price={pizza.price}
+                        imagePath={`/images/products/pizza-${pizza.id}.${imageExt}`}
+                        ingredients={pizza.ingredients}
+                        isSelected={selectedPizzas.includes(pizza.id)}
+                        onToggle={() =>
+                          toggleSelection(
+                            pizza.id,
+                            selectedPizzas,
+                            setSelectedPizzas
+                          )
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </Section>
 
             {/* Boissons */}
-            <section>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
-                Boissons
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {drinks
+            <Section
+              title="Nos Boissons"
+              icon={<Wine className="w-6 h-6" />}
+            >
+              {filteredDrinks.filter((d) => d.available).length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
+                  <Wine className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-500 font-medium">
+                    Aucun résultat dans la catégorie "Boissons"
+                  </p>
+                  <p className="text-sm text-slate-400 mt-1">
+                    Essayez avec d'autres mots-clés
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredDrinks
                   .filter((d) => d.available)
-                  .map((drink) => (
-                    <button
-                      key={drink.id}
-                      onClick={() =>
-                        toggleSelection(
-                          drink.id,
-                          selectedDrinks,
-                          setSelectedDrinks
-                        )
-                      }
-                      className={`text-left p-4 rounded-lg border-2 transition ${
-                        selectedDrinks.includes(drink.id)
-                          ? 'border-gray-900 bg-gray-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-medium text-gray-900">
-                            {drink.name}
-                          </h3>
-                          <p className="text-sm text-gray-500">
-                            {drink.size}
-                            {drink.withAlcohol && ' • Alcool'}
-                          </p>
-                        </div>
-                        <span className="text-gray-900 font-medium">
-                          {drink.price.toFixed(2)}€
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-              </div>
-            </section>
+                  .map((drink) => {
+                    // Format selon l'ID: 1=webp, 2=jpg, 3=jpg, 4=webp, 5=jpg
+                    const imageExt = [1, 4].includes(drink.id) ? 'webp' : 'jpg';
+                    return (
+                      <ProductCard
+                        key={drink.id}
+                        id={drink.id}
+                        name={drink.name}
+                        price={drink.price}
+                        imagePath={`/images/products/drink-${drink.id}.${imageExt}`}
+                        description={drink.size}
+                        badge={drink.withAlcohol ? 'Alcool' : undefined}
+                        isSelected={selectedDrinks.includes(drink.id)}
+                        imageStyle="contain"
+                        onToggle={() =>
+                          toggleSelection(
+                            drink.id,
+                            selectedDrinks,
+                            setSelectedDrinks
+                          )
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </Section>
 
             {/* Desserts */}
-            <section>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
-                Desserts
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {desserts
+            <Section
+              title="Nos Desserts"
+              icon={<IceCream className="w-6 h-6" />}
+            >
+              {filteredDesserts.filter((d) => d.available).length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
+                  <IceCream className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-500 font-medium">
+                    Aucun résultat dans la catégorie "Desserts"
+                  </p>
+                  <p className="text-sm text-slate-400 mt-1">
+                    Essayez avec d'autres mots-clés
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredDesserts
                   .filter((d) => d.available)
-                  .map((dessert) => (
-                    <button
-                      key={dessert.id}
-                      onClick={() =>
-                        toggleSelection(
-                          dessert.id,
-                          selectedDesserts,
-                          setSelectedDesserts
-                        )
-                      }
-                      className={`text-left p-4 rounded-lg border-2 transition ${
-                        selectedDesserts.includes(dessert.id)
-                          ? 'border-gray-900 bg-gray-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-medium text-gray-900">
-                          {dessert.name}
-                        </h3>
-                        <span className="text-gray-900 font-medium">
-                          {dessert.price.toFixed(2)}€
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-              </div>
-            </section>
+                  .map((dessert) => {
+                    // Format selon l'ID: 2=webp, les autres=jpg
+                    const imageExt = dessert.id === 2 ? 'webp' : 'jpg';
+                    return (
+                      <ProductCard
+                        key={dessert.id}
+                        id={dessert.id}
+                        name={dessert.name}
+                        price={dessert.price}
+                        imagePath={`/images/products/dessert-${dessert.id}.${imageExt}`}
+                        isSelected={selectedDesserts.includes(dessert.id)}
+                        onToggle={() =>
+                          toggleSelection(
+                            dessert.id,
+                            selectedDesserts,
+                            setSelectedDesserts
+                          )
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </Section>
           </div>
 
           {/* Colonne droite - Panier & Commandes */}
-          <div className="space-y-8">
-            {/* Panier */}
-            <div className="bg-white p-6 rounded-lg border border-gray-200 sticky top-4">
-              <div className="flex items-center gap-2 mb-4">
-                <ShoppingCart className="w-5 h-5 text-gray-700" />
-                <h2 className="text-lg font-medium text-gray-900">
-                  Votre commande
-                </h2>
-              </div>
+          <div className="space-y-6">
+            <Cart
+              pizzas={cartPizzas}
+              drinks={cartDrinks}
+              desserts={cartDesserts}
+              hasMenuDiscount={hasMenuDiscount}
+              isCreating={creating}
+              onCreateOrder={handleCreateOrder}
+            />
 
-              {selectedPizzas.length === 0 &&
-              selectedDrinks.length === 0 &&
-              selectedDesserts.length === 0 ? (
-                <p className="text-sm text-gray-500">Panier vide</p>
-              ) : (
-                <div className="space-y-4">
-                  <div className="space-y-2 text-sm">
-                    {selectedPizzas.map((id) => {
-                      const pizza = pizzas.find((p) => p.id === id);
-                      return (
-                        <div
-                          key={id}
-                          className="flex justify-between text-gray-700"
-                        >
-                          <span>{pizza?.name}</span>
-                          <span>{pizza?.price.toFixed(2)}€</span>
-                        </div>
-                      );
-                    })}
-                    {selectedDrinks.map((id) => {
-                      const drink = drinks.find((d) => d.id === id);
-                      return (
-                        <div
-                          key={id}
-                          className="flex justify-between text-gray-700"
-                        >
-                          <span>{drink?.name}</span>
-                          <span>{drink?.price.toFixed(2)}€</span>
-                        </div>
-                      );
-                    })}
-                    {selectedDesserts.map((id) => {
-                      const dessert = desserts.find((d) => d.id === id);
-                      return (
-                        <div
-                          key={id}
-                          className="flex justify-between text-gray-700"
-                        >
-                          <span>{dessert?.name}</span>
-                          <span>{dessert?.price.toFixed(2)}€</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {hasMenuDiscount && (
-                    <div className="pt-2 border-t border-gray-200">
-                      <div className="flex items-center gap-2 text-sm text-green-700 font-medium">
-                        <Check className="w-4 h-4" />
-                        <span>Réduction menu -10%</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <button
-                    onClick={handleCreateOrder}
-                    disabled={creating}
-                    className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {creating ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Commande en cours...</span>
-                      </>
-                    ) : (
-                      <span>Commander</span>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Commandes */}
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
-                Commandes récentes
-              </h2>
-              <div className="space-y-3">
-                {orders.slice(-5).reverse().map((order) => (
-                  <div
-                    key={order.id}
-                    className="p-3 border border-gray-200 rounded-lg"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-sm font-medium text-gray-900">
-                        Commande #{order.id}
-                      </span>
-                      <span className="text-sm font-medium text-gray-900">
-                        {order.totalPrice.toFixed(2)}€
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-500 mb-2">
-                      {order.pizzas.length} pizza(s), {order.drinks.length}{' '}
-                      boisson(s), {order.desserts.length} dessert(s)
-                    </div>
-                    {!order.processed ? (
-                      <button
-                        onClick={() => handleMarkProcessed(order.id)}
-                        className="text-xs text-gray-700 hover:text-gray-900 underline"
-                      >
-                        Marquer comme traitée
-                      </button>
-                    ) : (
-                      <div className="flex items-center gap-1 text-xs text-green-700">
-                        <Check className="w-3 h-3" />
-                        <span>Traitée</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <OrderList orders={orders} onMarkProcessed={handleMarkProcessed} />
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-200 py-8 mt-16">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <p className="text-lg font-semibold text-slate-900 mb-1">Chez Nest-Or</p>
+          <p className="text-slate-500 text-sm">
+            Pizzeria italienne depuis 2026
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

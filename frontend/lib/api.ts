@@ -41,8 +41,16 @@ export interface CreateOrderDto {
 }
 
 // Pizzas
-export async function getPizzas(): Promise<Pizza[]> {
-  const res = await fetch(`${API_URL}/pizzas`);
+export async function getPizzas(ingredients?: string[]): Promise<Pizza[]> {
+  let url = `${API_URL}/pizzas`;
+
+  if (ingredients && ingredients.length > 0) {
+    const params = new URLSearchParams();
+    params.set('ingredients', ingredients.join(','));
+    url += `?${params.toString()}`;
+  }
+
+  const res = await fetch(url);
   if (!res.ok) throw new Error('Failed to fetch pizzas');
   return res.json();
 }
