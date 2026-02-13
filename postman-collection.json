@@ -1,0 +1,261 @@
+{
+  "info": {
+    "name": "Chez Nestor API",
+    "description": "Collection complète pour tester l'API de pizzas et commandes avec validation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Pizzas",
+      "item": [
+        {
+          "name": "GET All Pizzas",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/pizzas"
+          }
+        },
+        {
+          "name": "GET Pizza by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/pizzas/1"
+          }
+        },
+        {
+          "name": "POST Pizza (Valid)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Calzone\"\n}"
+            },
+            "url": "{{base_url}}/pizzas"
+          }
+        },
+        {
+          "name": "POST Pizza (Invalid - Too Short)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"AB\"\n}"
+            },
+            "url": "{{base_url}}/pizzas"
+          }
+        },
+        {
+          "name": "POST Pizza (Invalid - Missing Name)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": "{{base_url}}/pizzas"
+          }
+        },
+        {
+          "name": "POST Pizza (Invalid - Extra Field)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Calzone\",\n  \"extraField\": \"should not be allowed\"\n}"
+            },
+            "url": "{{base_url}}/pizzas"
+          }
+        },
+        {
+          "name": "PUT Pizza",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Boisées Premium\"\n}"
+            },
+            "url": "{{base_url}}/pizzas/1"
+          }
+        },
+        {
+          "name": "DELETE Pizza",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/pizzas/5"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "GET All Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/orders"
+          }
+        },
+        {
+          "name": "GET Order by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/orders/1"
+          }
+        },
+        {
+          "name": "POST Order (Valid)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pizzas\": [1, 2, 3],\n  \"totalPrice\": 45.50\n}"
+            },
+            "url": "{{base_url}}/orders"
+          }
+        },
+        {
+          "name": "POST Order (Invalid - Empty Pizzas)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pizzas\": [],\n  \"totalPrice\": 45.50\n}"
+            },
+            "url": "{{base_url}}/orders"
+          }
+        },
+        {
+          "name": "POST Order (Invalid - Negative Price)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pizzas\": [1, 2],\n  \"totalPrice\": -10\n}"
+            },
+            "url": "{{base_url}}/orders"
+          }
+        },
+        {
+          "name": "POST Order (Invalid - Pizza ID Not Number)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pizzas\": [1, \"deux\", 3],\n  \"totalPrice\": 45.50\n}"
+            },
+            "url": "{{base_url}}/orders"
+          }
+        },
+        {
+          "name": "POST Order (Invalid - Missing Fields)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pizzas\": [1, 2]\n}"
+            },
+            "url": "{{base_url}}/orders"
+          }
+        },
+        {
+          "name": "PUT Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pizzas\": [1, 4],\n  \"totalPrice\": 30.00,\n  \"processed\": false\n}"
+            },
+            "url": "{{base_url}}/orders/1"
+          }
+        },
+        {
+          "name": "PATCH Order as Processed",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/orders/1/processed"
+          }
+        },
+        {
+          "name": "DELETE Order",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/orders/3"
+          }
+        }
+      ]
+    }
+  ]
+}

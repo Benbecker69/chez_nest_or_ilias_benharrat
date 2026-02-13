@@ -1,0 +1,289 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-02-12T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_1",
+      "_type": "workspace",
+      "name": "Chez Nestor API",
+      "description": "API de gestion de pizzas et commandes"
+    },
+    {
+      "_id": "env_1",
+      "_type": "environment",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000"
+      },
+      "parentId": "wrk_1"
+    },
+    {
+      "_id": "req_pizzas_get_all",
+      "_type": "request",
+      "parentId": "fld_pizzas",
+      "name": "GET All Pizzas",
+      "method": "GET",
+      "url": "{{ _.base_url }}/pizzas"
+    },
+    {
+      "_id": "req_pizzas_get_one",
+      "_type": "request",
+      "parentId": "fld_pizzas",
+      "name": "GET Pizza by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/pizzas/1"
+    },
+    {
+      "_id": "req_pizzas_create_valid",
+      "_type": "request",
+      "parentId": "fld_pizzas",
+      "name": "POST Pizza (Valid)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/pizzas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Calzone\"\n}"
+      }
+    },
+    {
+      "_id": "req_pizzas_create_invalid_short",
+      "_type": "request",
+      "parentId": "fld_pizzas",
+      "name": "POST Pizza (Invalid - Too Short)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/pizzas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"AB\"\n}"
+      }
+    },
+    {
+      "_id": "req_pizzas_create_invalid_missing",
+      "_type": "request",
+      "parentId": "fld_pizzas",
+      "name": "POST Pizza (Invalid - Missing Name)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/pizzas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{}"
+      }
+    },
+    {
+      "_id": "req_pizzas_create_invalid_extra",
+      "_type": "request",
+      "parentId": "fld_pizzas",
+      "name": "POST Pizza (Invalid - Extra Field)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/pizzas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Calzone\",\n  \"extraField\": \"should not be allowed\"\n}"
+      }
+    },
+    {
+      "_id": "req_pizzas_update",
+      "_type": "request",
+      "parentId": "fld_pizzas",
+      "name": "PUT Pizza",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/pizzas/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Boisées Premium\"\n}"
+      }
+    },
+    {
+      "_id": "req_pizzas_delete",
+      "_type": "request",
+      "parentId": "fld_pizzas",
+      "name": "DELETE Pizza",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/pizzas/5"
+    },
+    {
+      "_id": "req_orders_get_all",
+      "_type": "request",
+      "parentId": "fld_orders",
+      "name": "GET All Orders",
+      "method": "GET",
+      "url": "{{ _.base_url }}/orders"
+    },
+    {
+      "_id": "req_orders_get_one",
+      "_type": "request",
+      "parentId": "fld_orders",
+      "name": "GET Order by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/orders/1"
+    },
+    {
+      "_id": "req_orders_create_valid",
+      "_type": "request",
+      "parentId": "fld_orders",
+      "name": "POST Order (Valid)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/orders",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pizzas\": [1, 2, 3],\n  \"totalPrice\": 45.50\n}"
+      }
+    },
+    {
+      "_id": "req_orders_create_invalid_empty_pizzas",
+      "_type": "request",
+      "parentId": "fld_orders",
+      "name": "POST Order (Invalid - Empty Pizzas)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/orders",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pizzas\": [],\n  \"totalPrice\": 45.50\n}"
+      }
+    },
+    {
+      "_id": "req_orders_create_invalid_negative_price",
+      "_type": "request",
+      "parentId": "fld_orders",
+      "name": "POST Order (Invalid - Negative Price)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/orders",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pizzas\": [1, 2],\n  \"totalPrice\": -10\n}"
+      }
+    },
+    {
+      "_id": "req_orders_create_invalid_pizzas_not_number",
+      "_type": "request",
+      "parentId": "fld_orders",
+      "name": "POST Order (Invalid - Pizza ID Not Number)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/orders",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pizzas\": [1, \"deux\", 3],\n  \"totalPrice\": 45.50\n}"
+      }
+    },
+    {
+      "_id": "req_orders_create_invalid_missing_fields",
+      "_type": "request",
+      "parentId": "fld_orders",
+      "name": "POST Order (Invalid - Missing Fields)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/orders",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pizzas\": [1, 2]\n}"
+      }
+    },
+    {
+      "_id": "req_orders_update",
+      "_type": "request",
+      "parentId": "fld_orders",
+      "name": "PUT Order",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/orders/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"pizzas\": [1, 4],\n  \"totalPrice\": 30.00,\n  \"processed\": false\n}"
+      }
+    },
+    {
+      "_id": "req_orders_patch_processed",
+      "_type": "request",
+      "parentId": "fld_orders",
+      "name": "PATCH Order as Processed",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/orders/1/processed"
+    },
+    {
+      "_id": "req_orders_delete",
+      "_type": "request",
+      "parentId": "fld_orders",
+      "name": "DELETE Order",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/orders/3"
+    },
+    {
+      "_id": "fld_pizzas",
+      "_type": "request_group",
+      "parentId": "wrk_1",
+      "name": "Pizzas"
+    },
+    {
+      "_id": "fld_orders",
+      "_type": "request_group",
+      "parentId": "wrk_1",
+      "name": "Orders"
+    }
+  ]
+}
