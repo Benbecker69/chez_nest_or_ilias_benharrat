@@ -1,7 +1,9 @@
 export interface Order {
   id: number;
   pizzas: number[];
-  totalPrice: number;
+  drinks: number[];
+  desserts: number[];
+  totalPrice: number; // Calculé automatiquement côté serveur
   processed: boolean;
   createdAt: Date;
 }

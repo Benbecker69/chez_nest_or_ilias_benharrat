@@ -5,7 +5,6 @@ import {
   IsBoolean,
   IsOptional,
   ArrayMinSize,
-  Min,
 } from 'class-validator';
 
 export class UpdateOrderDto {
@@ -17,11 +16,20 @@ export class UpdateOrderDto {
   pizzas?: number[];
 
   @IsOptional()
-  @IsNumber({}, { message: 'Le prix total doit être un nombre' })
-  @Min(0, { message: 'Le prix total doit être positif ou zéro' })
-  totalPrice?: number;
+  @IsArray({ message: 'drinks doit être un tableau' })
+  @IsNumber({}, { each: true, message: 'Chaque ID de boisson doit être un nombre' })
+  @IsPositive({ each: true, message: 'Les IDs de boisson doivent être positifs' })
+  drinks?: number[];
+
+  @IsOptional()
+  @IsArray({ message: 'desserts doit être un tableau' })
+  @IsNumber({}, { each: true, message: 'Chaque ID de dessert doit être un nombre' })
+  @IsPositive({ each: true, message: 'Les IDs de dessert doivent être positifs' })
+  desserts?: number[];
 
   @IsOptional()
   @IsBoolean({ message: 'processed doit être un booléen' })
   processed?: boolean;
+
+  // NOTE: totalPrice n'est PAS dans le DTO car il est calculé automatiquement côté serveur
 }

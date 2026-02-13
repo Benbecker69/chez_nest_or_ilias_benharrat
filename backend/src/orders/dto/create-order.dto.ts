@@ -1,22 +1,29 @@
 import {
   IsArray,
-  IsNotEmpty,
   IsNumber,
   IsPositive,
   ArrayMinSize,
-  Min,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateOrderDto {
-  @IsNotEmpty({ message: 'La liste des pizzas est requise' })
   @IsArray({ message: 'pizzas doit être un tableau' })
   @ArrayMinSize(1, { message: 'La commande doit contenir au moins une pizza' })
   @IsNumber({}, { each: true, message: 'Chaque ID de pizza doit être un nombre' })
   @IsPositive({ each: true, message: 'Les IDs de pizza doivent être positifs' })
   pizzas: number[];
 
-  @IsNotEmpty({ message: 'Le prix total est requis' })
-  @IsNumber({}, { message: 'Le prix total doit être un nombre' })
-  @Min(0, { message: 'Le prix total doit être positif ou zéro' })
-  totalPrice: number;
+  @IsOptional()
+  @IsArray({ message: 'drinks doit être un tableau' })
+  @IsNumber({}, { each: true, message: 'Chaque ID de boisson doit être un nombre' })
+  @IsPositive({ each: true, message: 'Les IDs de boisson doivent être positifs' })
+  drinks?: number[];
+
+  @IsOptional()
+  @IsArray({ message: 'desserts doit être un tableau' })
+  @IsNumber({}, { each: true, message: 'Chaque ID de dessert doit être un nombre' })
+  @IsPositive({ each: true, message: 'Les IDs de dessert doivent être positifs' })
+  desserts?: number[];
+
+  // NOTE: totalPrice n'est PAS dans le DTO car il est calculé automatiquement côté serveur
 }
