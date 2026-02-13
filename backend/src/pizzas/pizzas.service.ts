@@ -6,10 +6,34 @@ import { UpdatePizzaDto } from './dto/update-pizza.dto';
 @Injectable()
 export class PizzasService {
   private pizzas: Pizza[] = [
-    { id: 1, name: 'Boisées' },
-    { id: 2, name: 'Oriantale' },
-    { id: 3, name: 'Quatre fromages' },
-    { id: 4, name: 'Kebab' },
+    {
+      id: 1,
+      name: 'Margherita',
+      price: 10.5,
+      ingredients: ['tomate', 'mozzarella', 'basilic'],
+      available: true,
+    },
+    {
+      id: 2,
+      name: 'Regina',
+      price: 12.0,
+      ingredients: ['tomate', 'mozzarella', 'jambon', 'champignons'],
+      available: true,
+    },
+    {
+      id: 3,
+      name: 'Quatre fromages',
+      price: 13.5,
+      ingredients: ['mozzarella', 'gorgonzola', 'parmesan', 'chèvre'],
+      available: true,
+    },
+    {
+      id: 4,
+      name: 'Calzone',
+      price: 14.0,
+      ingredients: ['tomate', 'mozzarella', 'jambon', 'champignons', 'œuf'],
+      available: false,
+    },
   ];
   private nextId = 5;
 
@@ -29,6 +53,9 @@ export class PizzasService {
     const newPizza: Pizza = {
       id: this.nextId++,
       name: createPizzaDto.name,
+      price: createPizzaDto.price,
+      ingredients: createPizzaDto.ingredients,
+      available: createPizzaDto.available,
     };
     this.pizzas.push(newPizza);
     return newPizza;
@@ -43,6 +70,9 @@ export class PizzasService {
     const updatedPizza: Pizza = {
       ...this.pizzas[pizzaIndex],
       ...(updatePizzaDto.name && { name: updatePizzaDto.name }),
+      ...(updatePizzaDto.price !== undefined && { price: updatePizzaDto.price }),
+      ...(updatePizzaDto.ingredients && { ingredients: updatePizzaDto.ingredients }),
+      ...(updatePizzaDto.available !== undefined && { available: updatePizzaDto.available }),
     };
 
     this.pizzas[pizzaIndex] = updatedPizza;

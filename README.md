@@ -1,98 +1,147 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Chez Nest-Or - API de Pizzeria
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> "Chez Nest-Or, le Nest plus ultra de la pizza"
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+API REST modulaire pour la gestion d'une pizzeria, développée avec NestJS et Next.js.
 
-## Description
+## 📁 Structure du projet
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
+```
+/
+├── backend/          # API NestJS
+├── frontend/         # Interface Next.js (à venir)
+└── README.md         # Ce fichier
 ```
 
-## Compile and run the project
+## 🚀 Démarrage rapide
+
+### Backend (API NestJS)
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cd backend
+npm install
+npm run start:dev
 ```
 
-## Run tests
+L'API sera disponible sur `http://localhost:3000`
+
+### Frontend (Next.js)
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cd frontend
+# À venir
 ```
 
-## Deployment
+## 📚 Architecture Backend
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```
+backend/src/
+├── pizzas/           # Gestion des pizzas
+├── drinks/           # Gestion des boissons (à venir)
+├── desserts/         # Gestion des desserts (à venir)
+├── orders/           # Gestion des commandes
+├── menu/             # Logique de réduction menu (à venir)
+└── app.module.ts     # Module racine
+```
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 🍕 Modules
 
+### Pizzas
+- **Modèle** : id, name, price, ingredients[], available
+- **Endpoints** : GET, POST, PUT, DELETE
+- **Validation** : nom (min 3 car), prix (>0), ingrédients (non vide)
+
+### Drinks *(à venir)*
+- **Modèle** : id, name, price, size, withAlcohol, available
+
+### Desserts *(à venir)*
+- **Modèle** : id, name, price, available
+
+### Orders
+- **Modèle** : id, pizzas[], drinks[], desserts[], totalPrice, processed, createdAt
+- **Logique métier** :
+  - totalPrice calculé automatiquement
+  - Vérification existence et disponibilité des ressources
+  - Réduction menu si applicable
+
+### Menu *(à venir)*
+- **Réduction 10%** si commande contient : 1 pizza + 1 boisson sans alcool + 1 dessert
+
+## 📖 Documentation API
+
+### Pizzas
+
+#### GET /pizzas
+Récupère toutes les pizzas
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+curl http://localhost:3000/pizzas
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+#### GET /pizzas/:id
+Récupère une pizza par ID
+```bash
+curl http://localhost:3000/pizzas/1
+```
 
-## Resources
+#### POST /pizzas
+Crée une nouvelle pizza
+```bash
+curl -X POST http://localhost:3000/pizzas \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Margherita",
+    "price": 10.50,
+    "ingredients": ["tomate", "mozzarella", "basilic"],
+    "available": true
+  }'
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+#### PUT /pizzas/:id
+Remplace complètement une pizza
+```bash
+curl -X PUT http://localhost:3000/pizzas/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Margherita Premium",
+    "price": 12.00,
+    "ingredients": ["tomate", "mozzarella buffalo", "basilic frais"],
+    "available": true
+  }'
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+#### DELETE /pizzas/:id
+Supprime une pizza
+```bash
+curl -X DELETE http://localhost:3000/pizzas/1
+```
 
-## Support
+### Orders *(documentation complète à venir)*
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 🧪 Tests
 
-## Stay in touch
+Des collections Postman et Insomnia sont disponibles :
+- `postman-collection.json`
+- `insomnia-collection.json`
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 🛠️ Technologies
 
-## License
+- **Backend** : NestJS, TypeScript, class-validator
+- **Frontend** : Next.js, React, TypeScript (à venir)
+- **Stockage** : En mémoire (NoSQL via fichiers JSON en option)
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## 📝 Statut du projet
+
+- [x] Module Pizzas - Complet
+- [ ] Module Drinks - À faire
+- [ ] Module Desserts - À faire
+- [ ] Module Menu - À faire
+- [ ] Module Orders - En cours (logique métier à compléter)
+- [ ] Frontend Next.js - À faire
+
+## 👨‍💻 Auteur
+
+Ilias Benharrat
+
+## 📄 Licence
+
+UNLICENSED
